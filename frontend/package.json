@@ -1,0 +1,23 @@
+{
+  "name": "$name$",
+  "version": "$version$",
+  "description": "$END$",
+  "main": "$main$",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "schema": "npx openapi-typescript https://127.0.0.1:8000/api/schema > src/schema.ts -t"
+  },
+  "private": true,
+  "dependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "axios": "^1.7.9",
+    "npx": "^10.2.2",
+    "openapi-typescript": "^7.6.1",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.1",
+    "vue": "^3.5.13"
+  },
+  "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af"
+}

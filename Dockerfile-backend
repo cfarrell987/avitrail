@@ -1,0 +1,16 @@
+FROM python:3.10-alpine
+LABEL authors="caleb"
+
+
+ENV PYTHONPATH="avitrail:$PYTHONPATH"
+ENV TZ='UTC'
+ENV DJANGO_SETTINGS_MODULE="avitrail.settings.development"
+
+RUN apk add rust cargo
+COPY requirements.txt ./
+RUN python3 -m ensurepip --upgrade
+RUN pip3 install -r requirements.txt --no-cache-dir
+
+COPY ./avitrail /app
+
+EXPOSE 8000

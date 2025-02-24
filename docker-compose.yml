@@ -1,0 +1,30 @@
+services:
+  web:
+    hostname: web
+    image: crow987/avitrail:latest
+    volumes:
+      - ./avitrail:/app
+    ports:
+      - 8000:8000
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/avitrail
+      - DEBUG=True
+      - SECRET_KEY=secret
+      - DJANGO_SETTINGS_MODULE=avitrail.settings.development
+    depends_on:
+      - db
+    networks:
+      - default
+    command: python app/manage.py runserver 0.0.0.0:8000
+
+  db:
+    image: postgres:15
+    hostname: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    networks:
+      - default
