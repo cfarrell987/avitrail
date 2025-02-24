@@ -7,7 +7,7 @@ The application consists of a Django backend and a Vue 3 frontend.
 - User authentication: Secure login with token-based authentication
 - Flight Logging: Add, edit, and delete flights
 - Flight History: View and search through flight history
-- Interactive Map: Visualize flight paths on an interactive map
+- Interactive Map: Visualize flight paths on an interactive map - _To be implemented_
 - REST API: Built using Django REST framework for easy data retrieval and manipulation allowing for future integrations
 
 ## Tech Stack
