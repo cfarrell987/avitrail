@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite",
     "build": "vite build",
-    "schema": "npx openapi-typescript https://127.0.0.1:8000/api/schema > src/schema.ts -t"
+    "schema": "npx openapi-typescript http://127.0.0.1:8000/api/schema > src/schema.ts -t"
   },
   "private": true,
   "dependencies": {
@@ -15,6 +15,7 @@
     "axios": "^1.7.9",
     "npx": "^10.2.2",
     "openapi-typescript": "^7.6.1",
+    "scss": "^0.2.4",
     "typescript": "^5.7.3",
     "vite": "^6.1.1",
     "vue": "^3.5.13"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import FlightLog from './components/FlightLog.vue';
+import FlightLog from './pages/FlightLog.vue';
 
 </script>
 
