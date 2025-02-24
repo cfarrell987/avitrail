@@ -1,30 +1,29 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import axios from "axios";
+import type { components } from "../schema";
 
-interface Flight {
-  id: number;
-  flight_number: string;
-  departure_airport: string;
-  arrival_airport: string;
-}
+type Flight = components["schemas"]["Flight"];
 
 const flights = ref<Flight[]>([]);
-const token = ref<string>("");
+const token = ref<string>(localStorage.getItem("token") || "");
 const loading = ref<boolean>(false);
 const username = ref<string>("");
 const password = ref<string>("");
 
 watch(token, (newToken) => {
   if (newToken) {
+    localStorage.setItem("token", newToken);
     fetchFlights();
+  } else {
+    localStorage.removeItem("token");
   }
 });
 
 const fetchFlights = async () => {
   loading.value = true;
   try {
-    const response = await axios.get("http://localhost:8000/api/flights/", {
+    const response = await axios.get("http://localhost:8000/api/flights/flights/", {
       headers: { Authorization: `Token ${token.value}` },
     });
     flights.value = response.data;
@@ -34,7 +33,7 @@ const fetchFlights = async () => {
   loading.value = false;
 };
 
-const handleLogin = async (): Promise<void> => {
+const handleLogin = async () => {
   try {
     const response = await axios.post("http://localhost:8000/api/auth/", {
       username: username.value,
@@ -45,6 +44,13 @@ const handleLogin = async (): Promise<void> => {
     console.error("Login failed", error);
   }
 };
+
+onMounted(() => {
+  if (token.value) {
+    fetchFlights();
+  }
+});
+
 </script>
 
 <template>
@@ -64,14 +70,40 @@ const handleLogin = async (): Promise<void> => {
     <div v-else>
       <h2 class="text-lg font-semibold">Your Flights</h2>
       <p v-if="loading">Loading...</p>
-      <ul v-else>
-        <li v-for="flight in flights" :key="flight.id">
-          {{ flight.flight_number }} - {{ flight.departure_airport }} to {{ flight.arrival_airport }}
-        </li>
-      </ul>
+      <table>
+      <thead>
+                <tr>
+                  <th>Flight Number</th>
+                  <th>Departure Airport</th>
+                  <th>Arrival Airport</th>
+                  <th>Departure Time</th>
+                  <th>Arrival Time</th>
+                  <th>Duration</th>
+                  <th>Airline</th>
+                  <th>Aircraft</th>
+                  <th>Distance</th>
+                  <th>Tail Number</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="flight in flights" :key="flight.id">
+                  <td>{{ flight.flight_number }}</td>
+                  <td>{{ flight.departure_airport }}</td>
+                  <td>{{ flight.arrival_airport }}</td>
+                  <td>{{ flight.departure_time }}</td>
+                  <td>{{ flight.arrival_time }}</td>
+                  <td>{{ flight.duration }}</td>
+                  <td>{{ flight.airline }}</td>
+                  <td>{{ flight.aircraft }}</td>
+                  <td>{{ flight.distance }}</td>
+                  <td>{{ flight.tail_number }}</td>
+                </tr>
+              </tbody>
+    </table>
     </div>
   </div>
 </template>
+
 
 
 <style scoped>
@@ -92,5 +124,10 @@ input {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 </style>
