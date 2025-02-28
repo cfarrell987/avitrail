@@ -4,8 +4,12 @@ import axios from "axios";
 import type { components } from "../schema";
 
 type Flight = components["schemas"]["Flight"];
+type Airport = components["schemas"]["Airport"];
+type Airline = components["schemas"]["Airline"];
 
 const flights = ref<Flight[]>([]);
+const airports = ref<Airport[]>([]);
+const airlines = ref<Airline[]>([]);
 const token = ref<string>(localStorage.getItem("token") || "");
 const loading = ref<boolean>(false);
 const username = ref<string>("");
@@ -15,6 +19,8 @@ watch(token, (newToken) => {
   if (newToken) {
     localStorage.setItem("token", newToken);
     fetchFlights();
+    fetchAirports();
+    fetchAirlines();
   } else {
     localStorage.removeItem("token");
   }
@@ -33,6 +39,25 @@ const fetchFlights = async () => {
   loading.value = false;
 };
 
+const fetchAirports = async () => {
+  try {
+    const response = await axios.get("http://localhost:8000/api/flights/airports/");
+    console.log(response.data);
+  } catch (error) {
+    console.error("Error fetching airports", error);
+  }
+};
+
+const fetchAirlines = async () => {
+  try {
+    const response = await axios.get("http://localhost:8000/api/flights/airlines/");
+    console.log(response.data);
+  } catch (error) {
+    console.error("Error fetching airlines", error);
+  }
+};
+
+
 const handleLogin = async () => {
   try {
     const response = await axios.post("http://localhost:8000/api/auth/", {
@@ -48,6 +73,8 @@ const handleLogin = async () => {
 onMounted(() => {
   if (token.value) {
     fetchFlights();
+    fetchAirlines()
+    fetchAirports()
   }
 });
 

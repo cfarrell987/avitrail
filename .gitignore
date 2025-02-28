@@ -534,10 +534,8 @@ pip-selfcheck.json
 #
 # Recommended template: Node.gitignore
 
-# TODO: where does this rule come from?
 docs/_book
 
-# TODO: where does this rule come from?
 test/
 
 ### Vuejs ###
@@ -547,3 +545,5 @@ npm-debug.log
 yarn-error.log
 
 # End of https://www.toptal.com/developers/gitignore/api/venv,direnv,django,python,jetbrains,node,vue,vuejs
+
+.idea/

@@ -12,6 +12,8 @@ from flights.urls import urlpatterns as flights_urlpatterns
 
 api_urls = [
     path("flights/", include("flights.urls")),
+    path("airports/", include("airports.urls")),
+    path("airlines/", include("airlines.urls")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "swagger/",

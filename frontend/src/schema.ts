@@ -4,6 +4,38 @@
  */
 
 export type paths = {
+    "/api/airlines/airlines/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["airlines_airlines_list"];
+        put?: never;
+        post: operations["airlines_airlines_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/airports/airports/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["airports_airports_list"];
+        put?: never;
+        post: operations["airports_airports_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/": {
         parameters: {
             query?: never;
@@ -60,6 +92,28 @@ export type paths = {
 export type webhooks = Record<string, never>;
 export type components = {
     schemas: {
+        Airline: {
+            readonly id: number;
+            ICAO?: string | null;
+            IATA?: string | null;
+            callsign?: string | null;
+            name: string;
+            country?: string | null;
+        };
+        Airport: {
+            readonly id: number;
+            ICAO: string;
+            IATA?: string | null;
+            name: string;
+            city?: string | null;
+            country?: string | null;
+            elevation?: number | null;
+            /** Format: double */
+            lat?: number | null;
+            /** Format: double */
+            lon?: number | null;
+            timezone?: string | null;
+        };
         AuthToken: {
             username: string;
             password: string;
@@ -89,6 +143,94 @@ export type components = {
 };
 export type $defs = Record<string, never>;
 export interface operations {
+    airlines_airlines_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Airline"][];
+                };
+            };
+        };
+    };
+    airlines_airlines_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Airline"];
+                "application/x-www-form-urlencoded": components["schemas"]["Airline"];
+                "multipart/form-data": components["schemas"]["Airline"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Airline"];
+                };
+            };
+        };
+    };
+    airports_airports_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Airport"][];
+                };
+            };
+        };
+    };
+    airports_airports_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Airport"];
+                "application/x-www-form-urlencoded": components["schemas"]["Airport"];
+                "multipart/form-data": components["schemas"]["Airport"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Airport"];
+                };
+            };
+        };
+    };
     auth_create: {
         parameters: {
             query?: never;

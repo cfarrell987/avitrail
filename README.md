@@ -49,3 +49,8 @@ The application consists of a Django backend and a Vue 3 frontend.
 
 ## Contributions
 Contributions are welcome! Feel free to open an issue or submit a pull request.
+
+
+## Acknowledgements
+- Airport data provided by [mwgg/Airports](https://github.com/mwgg/Airports)
+- Airline data provided by [npow/airline-codes](https://github.com/npow/airline-codes/)

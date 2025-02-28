@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     "drf_spectacular_sidecar",
     "corsheaders",
     "flights",
+    "airports",
+    "airlines",
+    "avitrail",
 ]
 
 REST_FRAMEWORK = {

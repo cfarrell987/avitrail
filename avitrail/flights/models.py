@@ -1,22 +1,39 @@
-from random import choices
+from datetime import datetime
 
 from django.db import models
+
+from airlines.models import Airline
+from airports.models import Airport
 
 
 class Flight(models.Model):
     flight_number = models.CharField(max_length=10)
-    departure_airport = models.CharField(max_length=3)
-    arrival_airport = models.CharField(max_length=3)
+    departure_airport = models.ForeignKey(
+        Airport, on_delete=models.CASCADE, related_name="departure_airport"
+    )
+    arrival_airport = models.ForeignKey(
+        Airport, on_delete=models.CASCADE, related_name="arrival_airport"
+    )
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
     duration = models.IntegerField()
-    airline = models.CharField(max_length=3)
+    airline = models.ForeignKey(Airline, on_delete=models.CASCADE)
     aircraft = models.CharField(max_length=4)
     distance = models.IntegerField()
     tail_number = models.CharField(max_length=10)
 
     def calculate_duration(self):
-        return self.arrival_time - self.departure_time
+        # Get the timezones of the departure and arrival airports and calculate the difference
+        # between the two
+        departure_tz = self.departure_airport.timezone
+        arrival_tz = self.arrival_airport.timezone
+        departure_time = datetime.datetime.strptime(
+            self.departure_time, "%Y-%m-%d %H:%M:%S", tzinfo=departure_tz
+        )
+        arrival_time = datetime.datetime.strptime(
+            self.arrival_time, "%Y-%m-%d %H:%M:%S", tzinfo=arrival_tz
+        )
+        return datetime.timedelta.total_seconds(arrival_time - departure_time)
 
     def __str__(self):
         return (

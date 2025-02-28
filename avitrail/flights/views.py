@@ -8,6 +8,7 @@ from flights.serializers import FlightSerializer
 # Create your views here.
 class FlightListCreateView(generics.ListCreateAPIView):
     queryset = Flight.objects.all()
+    filter_fields = ["airline", "departure", "arrival"]
     serializer_class = FlightSerializer
     permission_classes = [IsAuthenticated]
 
