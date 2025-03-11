@@ -30,6 +30,13 @@ class Command(BaseCommand):
         self.stdout.write(f"Importing airports from OurAirports")
 
         for airport in airports_data.values():
+            # Check if the icao contains a number to filter most small non-commercial airports
+
+            if any(char.isdigit() for char in airport["icao"]):
+                continue
+            elif airport["iata"] == "":
+                continue
+
             airport = Airport(
                 ICAO=airport["icao"],
                 IATA=airport["iata"],
