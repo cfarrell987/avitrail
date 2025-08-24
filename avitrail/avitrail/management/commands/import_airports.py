@@ -1,12 +1,9 @@
-import os
-import requests
-import certifi
-import ssl
-
 from django.db import IntegrityError
 
 from airports.models import Airport
 from django.core.management.base import BaseCommand
+
+from airports.models import Airport
 
 
 class Command(BaseCommand):
@@ -16,37 +13,68 @@ class Command(BaseCommand):
         """
         Pull latest airports JSON from mwgg/Airports repository and save them to the airports table
         """
-
         import json
-        from airports.models import Airport
+        import requests
+        import csv
+        from tqdm import tqdm
+        import timezonefinder
+
+        tf = timezonefinder.TimezoneFinder()
 
         resp = requests.get(
-            "https://raw.githubusercontent.com/mwgg/Airports/refs/heads/master/airports.json"
+            "https://raw.githubusercontent.com/davidmegginson/ourairports-data/refs/heads/main/airports.csv"
         )
-        airports_data = json.loads(resp.content.decode("utf-8"))
+
+        airports_data = [
+            row
+            for row in csv.DictReader(resp.content.decode("utf-8").splitlines())
+            if row["scheduled_service"] == "yes"
+        ]
+        # Filter out airports with no scheduled_service
+        airports_data = [
+            airport
+            for airport in airports_data
+            if airport["scheduled_service"] == "yes"
+        ]
 
         airports = []
 
         self.stdout.write(f"Importing airports from OurAirports")
 
-        for airport in airports_data.values():
+        for airport in tqdm(airports_data, desc="Processing airports"):
+            # check if the airport is already in the airports list
+            if airport["icao_code"] in [a.ICAO for a in airports]:
+                continue
+            # Skip exisitng airports with the same ICAO code
+            if Airport.objects.filter(ICAO=airport["icao_code"]).exists():
+                continue
             # Check if the icao contains a number to filter most small non-commercial airports
-
-            if any(char.isdigit() for char in airport["icao"]):
+            if any(char.isdigit() for char in airport["icao_code"]):
                 continue
-            elif airport["iata"] == "":
+            elif airport["iata_code"] == "":
                 continue
 
+            # Add tz key and get the timezone from the municipality and country
+            try:
+                # Ensure lat and lon are to the first decimal place
+                latitude = round(float(airport["latitude_deg"]), 1)
+                longitude = round(float(airport["longitude_deg"]), 1)
+                tz_str = tf.timezone_at(lat=latitude, lng=longitude)
+            except KeyError:
+                tz_str = "UTC"
+
+            if airport["elevation_ft"] == "":
+                airport["elevation_ft"] = None
             airport = Airport(
-                ICAO=airport["icao"],
-                IATA=airport["iata"],
+                ICAO=airport["icao_code"],
+                IATA=airport["iata_code"],
                 name=airport["name"],
-                city=airport["city"],
-                country=airport["country"],
-                elevation=airport["elevation"],
-                lat=airport["lat"],
-                lon=airport["lon"],
-                timezone=airport["tz"],
+                city=airport["municipality"],
+                country=airport["iso_country"],
+                elevation=airport["elevation_ft"],
+                lat=airport["latitude_deg"],
+                lon=airport["longitude_deg"],
+                timezone=tz_str,
             )
             airports.append(airport)
 
@@ -60,4 +88,4 @@ class Command(BaseCommand):
                     self.style.ERROR(f"Failed to save airport: {airport}. Error: {e}")
                 )
 
-        self.stdout.write(self.style.SUCCESS("Successfully imported airports"))
+            self.stdout.write(self.style.SUCCESS("Successfully imported airports"))

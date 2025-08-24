@@ -4,20 +4,28 @@ from flights.models import Flight, Seat
 
 
 class FlightAdmin(admin.ModelAdmin):
-    list_display = ("flight_number", "airline", "departure", "arrival", "duration")
+    list_display = (
+        "flight_number",
+        "airline",
+        "departure_airport",
+        "arrival_airport",
+        "duration",
+    )
     search_fields = (
         "flight_number",
         "airline",
         "departure_time",
         "arrival_time",
         "duration",
+        "departure_airport",
+        "arrival_airport",
     )
-    list_filter = ("airline", "departure_time", "arrival_time", "tail_number")
+    list_filter = ("flight_number", "tail_number")
 
-    def departure(self, obj):
+    def departure_time(self, obj):
         return obj.departure_time.strftime("%Y-%m-%d %H:%M:%S")
 
-    def arrival(self, obj):
+    def arrival_time(self, obj):
         return obj.arrival_time.strftime("%Y-%m-%d %H:%M:%S")
 
     def duration(self, obj):

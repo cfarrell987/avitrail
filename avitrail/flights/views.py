@@ -12,6 +12,11 @@ class FlightListCreateView(generics.ListCreateAPIView):
     serializer_class = FlightSerializer
     permission_classes = [IsAuthenticated]
 
-    def create(self, serializer):
+    def get_queryset(self):
+        return Flight.objects.select_related(
+            "departure_airport", "arrival_airport", "airline"
+        ).all()
+
+    def perform_create(self, serializer):
         response = serializer.save(user=self.request.user)
         return response

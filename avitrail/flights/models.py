@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib.auth.models import User
 from django.db import models
 
 from airlines.models import Airline
@@ -7,6 +8,7 @@ from airports.models import Airport
 
 
 class Flight(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     flight_number = models.CharField(max_length=10)
     departure_airport = models.ForeignKey(
         Airport, on_delete=models.CASCADE, related_name="departure_airport"
@@ -18,22 +20,9 @@ class Flight(models.Model):
     arrival_time = models.DateTimeField()
     duration = models.IntegerField()
     airline = models.ForeignKey(Airline, on_delete=models.CASCADE)
-    aircraft = models.CharField(max_length=4)
+    aircraft = models.CharField(max_length=4, null=True, blank=True)
     distance = models.IntegerField()
-    tail_number = models.CharField(max_length=10)
-
-    def calculate_duration(self):
-        # Get the timezones of the departure and arrival airports and calculate the difference
-        # between the two
-        departure_tz = self.departure_airport.timezone
-        arrival_tz = self.arrival_airport.timezone
-        departure_time = datetime.datetime.strptime(
-            self.departure_time, "%Y-%m-%d %H:%M:%S", tzinfo=departure_tz
-        )
-        arrival_time = datetime.datetime.strptime(
-            self.arrival_time, "%Y-%m-%d %H:%M:%S", tzinfo=arrival_tz
-        )
-        return datetime.timedelta.total_seconds(arrival_time - departure_time)
+    tail_number = models.CharField(max_length=10, null=True, blank=True)
 
     def __str__(self):
         return (

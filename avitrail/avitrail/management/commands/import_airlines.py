@@ -8,6 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         import json
+        from tqdm import tqdm
         from airlines.models import Airline
 
         airlines = []
@@ -17,8 +18,12 @@ class Command(BaseCommand):
         )
         airlines_data = json.loads(resp.content.decode("utf-8"))
 
-        for airline in airlines_data:
-            if airline["active"] is "Y":
+        for airline in tqdm(airlines_data, desc="Processing airlines"):
+            # Skip existing airlines with the same ICAO code
+            if Airline.objects.filter(ICAO=airline["icao"]).exists():
+                continue
+
+            if airline["active"] == "Y":
                 airline = Airline(
                     ICAO=airline["icao"],
                     IATA=airline["iata"],
