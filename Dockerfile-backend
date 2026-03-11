@@ -1,16 +1,25 @@
-FROM python:3.10-alpine
+#Build Image
+FROM astral/uv:python3.11-bookworm-slim as builder
+
+WORKDIR /app
+COPY pyproject.toml uv.lock ./
+RUN apt-get update
+RUN apt-get install -y libffi-dev build-essential libssl-dev libffi-dev
+RUN uv sync --locked --no-dev --compile-bytecode --no-install-project
+
+
+# Deployed Image
+FROM python:3.11-slim-bookworm
 LABEL authors="caleb"
 
-
-ENV PYTHONPATH="avitrail:$PYTHONPATH"
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH="avitrail:/app"
 ENV TZ='UTC'
 ENV DJANGO_SETTINGS_MODULE="avitrail.settings.development"
 
-RUN apk add rust cargo
-COPY requirements.txt ./
-RUN python3 -m ensurepip --upgrade
-RUN pip3 install -r requirements.txt --no-cache-dir
+COPY --from=builder /app/.venv /app/.venv
 
-COPY ./avitrail /app
+WORKDIR /app
+COPY ./avitrail .
 
 EXPOSE 8000
