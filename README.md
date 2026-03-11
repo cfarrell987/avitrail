@@ -21,7 +21,6 @@ The application consists of a Django backend and a Vue 3 frontend.
 ### Frontend
 - Vue 3: JavaScript framework for building the frontend
 - Axios: Promise-based HTTP client for making API requests
-- TypeScript: Superset of JavaScript for static typing
 - Vite: Build tool for modern web development
 
 ## Setup Instructions
