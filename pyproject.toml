@@ -1,0 +1,26 @@
+[project]
+name = "avitrail"
+version = "0.1.0"
+description = "AviTrail is a flight logging web application that allows users to track their flights and store flight history"
+readme = "README.md"
+requires-python = ">=3.14"
+authors = ["Caleb Farrell <me@cfarrell.dev>"]
+dependencies = [
+    "dj-database-url==2.3.0",
+    "django==5.1.7",
+    "django-cors-headers==4.7.0",
+    "djangorestframework==3.15.2",
+    "drf-spectacular==0.28.0",
+    "drf-spectacular-sidecar==2025.2.1",
+    "psycopg-binary==3.2.10",
+    "pytz==2025.2",
+    "requests==2.32.3",
+    "timezonefinder==6.5.9",
+    "tqdm==4.67.1",
+]
+
+[dependency-groups]
+dev = [
+    "black>=26.3.0",
+    "pre-commit>=4.5.1",
+]
