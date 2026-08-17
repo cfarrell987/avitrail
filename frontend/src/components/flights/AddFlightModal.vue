@@ -285,7 +285,7 @@ export default {
         } catch (error) {
           const departure = new Date(depTime)
           const arrival = new Date(arrTime)
-          flightData.value.duration = Math.floor((arrival - arrival) / 60000)
+          flightData.value.duration = Math.floor((arrival - departure) / 60000)
         }
       }
     }

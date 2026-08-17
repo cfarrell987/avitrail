@@ -82,7 +82,7 @@ export const generateFlightStats = (flights) => {
 
   // Get unique countries (simplified - would need airport data for real implementation)
   const countries = new Set()
-  flights.forEach(flight => {
+  flights.forEach(() => {
     // This would be replaced with actual country lookup from airport data
     countries.add('Sample Country')
   })
