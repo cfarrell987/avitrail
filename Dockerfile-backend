@@ -1,6 +1,8 @@
 #Build Image
 FROM astral/uv:python3.11-bookworm-slim as builder
 
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
+
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN apt-get update
@@ -12,12 +14,14 @@ RUN uv sync --locked --no-dev --compile-bytecode --no-install-project
 FROM python:3.11-slim-bookworm
 LABEL authors="caleb"
 
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONPATH="avitrail:/app"
 ENV TZ='UTC'
 ENV DJANGO_SETTINGS_MODULE="avitrail.settings.development"
 
-COPY --from=builder /app/.venv /app/.venv
+# Installed outside /app: docker-compose bind-mounts ./avitrail over /app for
+# live code reload in dev, which would otherwise shadow and delete the venv.
+COPY --from=builder /opt/venv /opt/venv
 
 WORKDIR /app
 COPY ./avitrail .
