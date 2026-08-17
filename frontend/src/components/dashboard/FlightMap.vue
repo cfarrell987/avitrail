@@ -27,7 +27,7 @@ export default {
     flights: Array
   },
   emits: ['add-sample-flight', 'add-real-flight'],
-  setup(props, { emit }) {
+  setup(props) {
     const mapContainer = ref(null)
     const airportService = new AirportService()
     let map = null
