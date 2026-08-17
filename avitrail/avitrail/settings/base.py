@@ -9,9 +9,11 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+
 import os
 import dj_database_url
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -22,7 +24,10 @@ CURRENT_ENV = None
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "change-me")
+try:
+    SECRET_KEY = os.environ["SECRET_KEY"]
+except KeyError:
+    raise ImproperlyConfigured("The SECRET_KEY environment variable must be set.")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
