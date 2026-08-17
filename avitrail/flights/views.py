@@ -1,22 +1,22 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
+from avitrail.pagination import StandardResultsPagination
 from flights.models import Flight
 from flights.serializers import FlightSerializer
 
 
-# Create your views here.
 class FlightListCreateView(generics.ListCreateAPIView):
-    queryset = Flight.objects.all()
-    filter_fields = ["airline", "departure", "arrival"]
     serializer_class = FlightSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsPagination
 
     def get_queryset(self):
-        return Flight.objects.select_related(
-            "departure_airport", "arrival_airport", "airline"
-        ).all()
+        return (
+            Flight.objects.filter(user=self.request.user)
+            .select_related("departure_airport", "arrival_airport", "airline")
+            .order_by("-departure_time", "-id")
+        )
 
     def perform_create(self, serializer):
-        response = serializer.save(user=self.request.user)
-        return response
+        serializer.save(user=self.request.user)
