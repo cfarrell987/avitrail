@@ -3,24 +3,20 @@ import { ApiService } from './api'
 const apiService = new ApiService()
 
 export class AirlineService {
-  async getAllAirlines() {
-    return await apiService.getAirlines()
-  }
-
   async searchAirlines(query) {
-    const airlines = await this.getAllAirlines()
-    return airlines.filter(airline =>
-      airline.ICAO?.toLowerCase().includes(query.toLowerCase()) ||
-      airline.IATA?.toLowerCase().includes(query.toLowerCase()) ||
-      airline.name.toLowerCase().includes(query.toLowerCase())
-    )
+    if (!query || query.length < 2) return []
+    const response = await apiService.getAirlines({ search: query })
+    return response.results
   }
 
   async getAirlineByCode(code) {
-    const airlines = await this.getAllAirlines()
-    return airlines.find(airline =>
-      airline.ICAO === code.toUpperCase() ||
-      airline.IATA === code.toUpperCase()
+    if (!code) return null
+    const response = await apiService.getAirlines({ search: code })
+    const upperCode = code.toUpperCase()
+    return (
+      response.results.find(
+        airline => airline.ICAO === upperCode || airline.IATA === upperCode
+      ) || null
     )
   }
 }

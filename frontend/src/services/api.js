@@ -62,8 +62,9 @@ export class ApiService {
   }
 
   // Flight endpoints
-  async getFlights() {
-    const response = await axios.get('/flights/flights/')
+  // `url` lets callers follow a paginated response's `next` link directly.
+  async getFlights(url = '/flights/flights/') {
+    const response = await axios.get(url)
     return response.data
   }
 
@@ -73,14 +74,14 @@ export class ApiService {
   }
 
   // Airport endpoints
-  async getAirports() {
-    const response = await axios.get('/airports/airports/')
+  async getAirports(params = {}) {
+    const response = await axios.get('/airports/airports/', { params })
     return response.data
   }
 
   // Airline endpoints
-  async getAirlines() {
-    const response = await axios.get('/airlines/airlines/')
+  async getAirlines(params = {}) {
+    const response = await axios.get('/airlines/airlines/', { params })
     return response.data
   }
 }

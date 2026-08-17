@@ -15,7 +15,7 @@
         <div class="col-12">
           <FlightMap
             :flights="flights"
-            @add-real-flight="showAddFlightModal = true"
+            @add-real-flight="openAddFlightModal"
           />
         </div>
       </div>
@@ -23,6 +23,7 @@
 
     <AddFlightModal
       :show="showAddFlightModal"
+      :error="addFlightError"
       @close="showAddFlightModal = false"
       @submit="addFlight"
     />
@@ -52,6 +53,7 @@ export default {
     const authStore = useAuthStore()
     const flightStore = useFlightStore()
     const showAddFlightModal = ref(false)
+    const addFlightError = ref('')
 
     const logout = () => {
       authStore.logout()
@@ -59,12 +61,18 @@ export default {
       router.push('/')
     }
 
+    const openAddFlightModal = () => {
+      addFlightError.value = ''
+      showAddFlightModal.value = true
+    }
+
     const addFlight = async (flightData) => {
       try {
         await flightStore.addFlight(flightData)
+        addFlightError.value = ''
         showAddFlightModal.value = false
       } catch (err) {
-        console.error('Failed to add flight:', err)
+        addFlightError.value = err.message
       }
     }
 
@@ -75,7 +83,9 @@ export default {
     return {
       flights: flightStore.flights,
       showAddFlightModal,
+      addFlightError,
       logout,
+      openAddFlightModal,
       addFlight
     }
   }
