@@ -24,5 +24,6 @@ dependencies = [
 [dependency-groups]
 dev = [
     "black>=26.3.0",
+    "coverage>=7.6.0",
     "pre-commit>=4.5.1",
 ]
