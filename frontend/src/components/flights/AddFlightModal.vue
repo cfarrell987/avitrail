@@ -7,6 +7,7 @@
           <button type="button" class="btn-close" @click="$emit('close')"></button>
         </div>
         <div class="modal-body">
+          <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
           <form @submit.prevent="handleSubmit">
             <div class="row mb-3">
               <div class="col-md-6">
@@ -33,7 +34,11 @@
                         @click="selectAirline(airline)"
                     >
                       {{ airline.IATA }} - {{ airline.name }}
+                      <span v-if="airline.disabled_at" class="badge bg-secondary ms-1">Closed</span>
                     </button>
+                  </div>
+                  <div v-if="selectedAirline?.disabled_at" class="form-text text-warning">
+                    Ceased operating {{ formatClosedDate(selectedAirline.disabled_at) }} — only flights departing before that date can be logged here.
                   </div>
                 </div>
               </div>
@@ -60,7 +65,11 @@
                         @click="selectDepartureAirport(airport)"
                     >
                       {{ airport.IATA || airport.ICAO }} - {{ airport.name }}, {{ airport.city }}
+                      <span v-if="airport.disabled_at" class="badge bg-secondary ms-1">Closed</span>
                     </button>
+                  </div>
+                  <div v-if="selectedDepartureAirport?.disabled_at" class="form-text text-warning">
+                    Closed {{ formatClosedDate(selectedDepartureAirport.disabled_at) }} — only flights departing before that date can be logged here.
                   </div>
                 </div>
               </div>
@@ -84,7 +93,11 @@
                         @click="selectArrivalAirport(airport)"
                     >
                       {{ airport.IATA || airport.ICAO }} - {{ airport.name }}, {{ airport.city }}
+                      <span v-if="airport.disabled_at" class="badge bg-secondary ms-1">Closed</span>
                     </button>
+                  </div>
+                  <div v-if="selectedArrivalAirport?.disabled_at" class="form-text text-warning">
+                    Closed {{ formatClosedDate(selectedArrivalAirport.disabled_at) }} — only flights arriving before that date can be logged here.
                   </div>
                 </div>
               </div>
@@ -149,7 +162,8 @@ import { debounce } from '../../utils/helpers'
 export default {
   name: 'AddFlightModal',
   props: {
-    show: Boolean
+    show: Boolean,
+    error: String
   },
   emits: ['close', 'submit'],
   setup(props, { emit }) {
@@ -320,9 +334,16 @@ export default {
 
     const handleSubmit = () => {
       if (isFormValid.value) {
+        // Don't reset here — the parent only closes this modal (which
+        // resets the form via the `show` watcher below) once the flight is
+        // actually saved. On failure the form stays as-is so the user can
+        // see what they submitted alongside the error.
         emit('submit', { ...flightData.value })
-        resetForm()
       }
+    }
+
+    const formatClosedDate = (isoString) => {
+      return new Date(isoString).toLocaleDateString()
     }
 
     const resetForm = () => {
@@ -364,6 +385,9 @@ export default {
       airlineResults,
       departureResults,
       arrivalResults,
+      selectedAirline,
+      selectedDepartureAirport,
+      selectedArrivalAirport,
       isFormValid,
       searchAirlines,
       searchDepartureAirports,
@@ -372,6 +396,7 @@ export default {
       selectDepartureAirport,
       selectArrivalAirport,
       calculateDuration,
+      formatClosedDate,
       handleSubmit
     }
   }

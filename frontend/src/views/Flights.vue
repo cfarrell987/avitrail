@@ -6,7 +6,7 @@
       <div class="row mb-4">
         <div class="col">
           <h2 class="mb-4">My Flights</h2>
-          <button class="btn btn-gradient text-white" @click="showAddFlightModal = true">
+          <button class="btn btn-gradient text-white" @click="openAddFlightModal">
             <i class="fas fa-plus me-2"></i>Add Flight
           </button>
         </div>
@@ -31,6 +31,7 @@
 
     <AddFlightModal
       :show="showAddFlightModal"
+      :error="addFlightError"
       @close="showAddFlightModal = false"
       @submit="addFlight"
     />
@@ -59,6 +60,7 @@ export default {
     const flightStore = useFlightStore()
 
     const showAddFlightModal = ref(false)
+    const addFlightError = ref('')
 
     const logout = () => {
       authStore.logout()
@@ -66,12 +68,18 @@ export default {
       router.push('/')
     }
 
+    const openAddFlightModal = () => {
+      addFlightError.value = ''
+      showAddFlightModal.value = true
+    }
+
     const addFlight = async (flightData) => {
       try {
         await flightStore.addFlight(flightData)
+        addFlightError.value = ''
         showAddFlightModal.value = false
       } catch (err) {
-        console.error('Failed to add flight:', err)
+        addFlightError.value = err.message
       }
     }
 
@@ -81,8 +89,10 @@ export default {
 
     return {
       showAddFlightModal,
+      addFlightError,
       flights: flightStore.flights,
       logout,
+      openAddFlightModal,
       addFlight
     }
   }

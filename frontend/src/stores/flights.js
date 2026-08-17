@@ -4,10 +4,29 @@ import { ApiService } from '../services/api'
 const apiService = new ApiService()
 const flights = ref([])
 
+const extractErrorMessage = (error) => {
+  const data = error.response?.data
+  if (data && typeof data === 'object') {
+    const messages = Object.values(data).flat()
+    if (messages.length) return messages.join(' ')
+  }
+  return 'Failed to add flight. Please try again.'
+}
+
 export function useFlightStore() {
   const loadFlights = async () => {
     try {
-      flights.value = await apiService.getFlights()
+      // The API paginates flights, so walk every page and flatten into one list.
+      let allFlights = []
+      let nextUrl = undefined
+
+      do {
+        const page = await apiService.getFlights(nextUrl)
+        allFlights = allFlights.concat(page.results)
+        nextUrl = page.next
+      } while (nextUrl)
+
+      flights.value = allFlights
     } catch (error) {
       console.error('Failed to load flights:', error)
       // Use sample data for demo
@@ -39,13 +58,10 @@ export function useFlightStore() {
       const flight = await apiService.createFlight(flightData)
       flights.value.push(flight)
     } catch (error) {
-      console.error('Failed to add flight:', error)
-      // Demo: Add flight locally
-      const newFlight = {
-        ...flightData,
-        id: Date.now()
-      }
-      flights.value.push(newFlight)
+      // Rethrow with a readable message instead of silently faking success —
+      // a rejected flight (e.g. a closed airport/airline, see backend
+      // validation) must not appear to have been added.
+      throw new Error(extractErrorMessage(error))
     }
   }
 
