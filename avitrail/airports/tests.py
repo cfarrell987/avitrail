@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from airports.admin import AirportAdmin
 from airports.models import Airport
 
 
@@ -37,6 +39,32 @@ class AirportCodeFormatTests(APITestCase):
     def test_blank_iata_allowed(self):
         airport = Airport(ICAO="KLAX", IATA=None, name="Los Angeles Intl")
         airport.full_clean()
+
+
+class AirportLifecycleTests(APITestCase):
+    def test_is_active_reflects_disabled_at(self):
+        airport = Airport.objects.create(ICAO="KLAX", IATA="LAX", name="LAX")
+        self.assertTrue(airport.is_active)
+
+        airport.disabled_at = timezone.now()
+        airport.save()
+        self.assertFalse(airport.is_active)
+
+    def test_empty_string_iata_normalized_to_null_on_save(self):
+        # bulk_create() (used by the import commands) bypasses save(), so
+        # this normalization only kicks in on the ORM's normal save path —
+        # covered separately by the import command's own tests.
+        airport = Airport(ICAO="KLAX", IATA="", name="LAX")
+        airport.save()
+        self.assertIsNone(airport.IATA)
+
+
+class AirportAdminTests(APITestCase):
+    def test_timezone_display_method(self):
+        airport = Airport(
+            ICAO="KLAX", IATA="LAX", name="LAX", timezone="America/Los_Angeles"
+        )
+        self.assertEqual(AirportAdmin.timezone(None, airport), "America/Los_Angeles")
 
 
 class AirportUniquenessTests(APITestCase):

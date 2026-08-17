@@ -26,7 +26,9 @@ CURRENT_ENV = None
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
     SECRET_KEY = os.environ["SECRET_KEY"]
-except KeyError:
+# Settings only ever import successfully when this is set, so this branch
+# can't be reached from within an already-running test process.
+except KeyError:  # pragma: no cover
     raise ImproperlyConfigured("The SECRET_KEY environment variable must be set.")
 
 

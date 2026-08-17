@@ -1,0 +1,63 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  backend:
+    name: Backend tests + coverage
+    runs-on: ubuntu-latest
+    # Real Postgres (not sqlite) so this actually exercises the pg_trgm
+    # extension, GIN trigram indexes, and PROTECT foreign key behavior
+    # this project depends on.
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: avitrail
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/avitrail
+      SECRET_KEY: ci-test-secret-key
+      DJANGO_SETTINGS_MODULE: avitrail.settings.development
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Run tests under coverage
+        working-directory: avitrail
+        run: uv run coverage run manage.py test
+
+      - name: Enforce coverage threshold
+        working-directory: avitrail
+        run: uv run coverage report --fail-under=100
+
+      - name: Generate coverage XML
+        if: always()
+        working-directory: avitrail
+        run: uv run coverage xml
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: avitrail/coverage.xml

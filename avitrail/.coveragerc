@@ -1,0 +1,14 @@
+[run]
+source = .
+omit =
+    manage.py
+    */migrations/*
+    */__pycache__/*
+    avitrail/asgi.py
+    avitrail/wsgi.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __str__
+    def __repr__

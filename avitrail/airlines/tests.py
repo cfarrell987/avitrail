@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -37,6 +38,25 @@ class AirlineCodeFormatTests(APITestCase):
     def test_blank_codes_allowed(self):
         airline = Airline(ICAO=None, IATA=None, name="No Codes Airline")
         airline.full_clean()
+
+
+class AirlineLifecycleTests(APITestCase):
+    def test_is_active_reflects_disabled_at(self):
+        airline = Airline.objects.create(ICAO="UAL", IATA="UA", name="United")
+        self.assertTrue(airline.is_active)
+
+        airline.disabled_at = timezone.now()
+        airline.save()
+        self.assertFalse(airline.is_active)
+
+    def test_empty_string_codes_normalized_to_null_on_save(self):
+        # bulk_create() (used by the import commands) bypasses save(), so
+        # this normalization only kicks in on the ORM's normal save path —
+        # covered separately by the import command's own tests.
+        airline = Airline(ICAO="", IATA="", name="Blank Codes Airline")
+        airline.save()
+        self.assertIsNone(airline.ICAO)
+        self.assertIsNone(airline.IATA)
 
 
 class AirlineUniquenessTests(APITestCase):
