@@ -7,7 +7,7 @@ requires-python = ">=3.11"
 authors = ["Caleb Farrell <me@cfarrell.dev>"]
 dependencies = [
     "dj-database-url==2.3.0",
-    "django==5.1.7",
+    "django~=5.1.15",
     "django-cors-headers==4.7.0",
     "djangorestframework==3.15.2",
     "drf-spectacular==0.28.0",
