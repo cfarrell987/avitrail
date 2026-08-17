@@ -11,15 +11,15 @@ class Flight(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     flight_number = models.CharField(max_length=10)
     departure_airport = models.ForeignKey(
-        Airport, on_delete=models.CASCADE, related_name="departure_airport"
+        Airport, on_delete=models.PROTECT, related_name="departure_airport"
     )
     arrival_airport = models.ForeignKey(
-        Airport, on_delete=models.CASCADE, related_name="arrival_airport"
+        Airport, on_delete=models.PROTECT, related_name="arrival_airport"
     )
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
     duration = models.IntegerField()
-    airline = models.ForeignKey(Airline, on_delete=models.CASCADE)
+    airline = models.ForeignKey(Airline, on_delete=models.PROTECT)
     aircraft = models.CharField(max_length=4, null=True, blank=True)
     distance = models.IntegerField()
     tail_number = models.CharField(max_length=10, null=True, blank=True)
