@@ -25,26 +25,19 @@ The application consists of a Django backend and a Vue 3 frontend.
 
 ## Setup Instructions
 
-### Backend
+### Quick start (Docker)
 1. Clone the repository
+2. `docker compose up -d` — brings up Postgres, the Django backend (migrations run automatically on boot), and the frontend (built and served via nginx)
+3. Navigate to `http://localhost:8080` in your browser
+4. *Optional* Create a superuser: `docker compose exec web python manage.py createsuperuser`
 
-3. Use docker-compose to initialize the PostgreSQL database
-   1. `docker compose up -d`
-4. Run the Django migrations
-   1. `docker compose exec web python /app/manage.py migrate`'
-5. *Optional* Create a superuser
-   1. `docker compose exec web python /app/manage.py createsuperuser`
-
-
-### Frontend
-1. Navigate to the `frontend` directory
-2. Install dependencies
-   1. `pnpm install`
-2. Start the development server
-   1. `pnpm run dev`
-2. Navigate to `http://localhost:5173` in your browser
-
-   > Note: frontend docker setup is in progress
+### Frontend (local dev)
+For active frontend development, run it outside Docker so you get Vite's dev server (hot reload, etc.) instead of a static nginx build:
+1. Bring up just the backend: `docker compose up -d db web`
+2. Navigate to the `frontend` directory
+3. Install dependencies: `pnpm install`
+4. Start the dev server: `pnpm run dev`
+5. Navigate to `http://localhost:5173` in your browser
 
 ## Contributions
 Contributions are welcome! Feel free to open an issue or submit a pull request.

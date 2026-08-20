@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { SessionManager } from '../utils/auth'
-
-const API_BASE = 'http://localhost:8000/api'
+import { API_CONFIG } from '../utils/constants'
 
 export class ApiService {
   constructor() {
@@ -10,7 +9,7 @@ export class ApiService {
   }
 
   setupAxios() {
-    axios.defaults.baseURL = API_BASE
+    axios.defaults.baseURL = API_CONFIG.BASE_URL
     const token = SessionManager.getToken()
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Token ${token}`
