@@ -5,6 +5,12 @@ services:
       context: .
       dockerfile: Dockerfile-backend
     image: crow987/avitrail:latest
+    # Local-dev convenience only (live code reload without a rebuild).
+    # Remove this for any deployment that just runs the built/pulled image
+    # (e.g. Portainer) — a bind mount here resolves relative to wherever
+    # that host stores the stack, not this repo, so it silently mounts an
+    # empty directory over /app and shadows manage.py and everything else
+    # the image baked in. See AVI-41 for a proper prod-safe compose split.
     volumes:
       - ./avitrail:/app
     ports:
