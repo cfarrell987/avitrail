@@ -30,6 +30,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_BASE_URL: http://localhost:8000/api
+    image: crow987/avitrail-frontend:latest
     ports:
       - 8080:80
     depends_on:
