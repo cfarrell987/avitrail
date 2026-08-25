@@ -1,5 +1,12 @@
+// Precedence: runtime env var (set per-container, no rebuild needed —
+// see runtime-config-entrypoint.sh) > build-time Vite env > hardcoded
+// fallback. The runtime value is what makes one published image work
+// correctly from more than one deployment host/port.
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
+  BASE_URL:
+    window.__RUNTIME_CONFIG__?.API_BASE_URL ||
+    import.meta.env.VITE_API_BASE_URL ||
+    'http://localhost:8000/api',
   TIMEOUT: 10000
 }
 

@@ -1,4 +1,5 @@
 import json
+import os
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
@@ -17,6 +18,27 @@ from avitrail.management.commands.import_airports import (
     Command as ImportAirportsCommand,
 )
 from avitrail.permissions import IsAdminOrReadOnly
+from avitrail.settings.development import _env_list
+
+
+class EnvListTests(TestCase):
+    """_env_list() backs CORS_ALLOWED_ORIGINS/CSRF_TRUSTED_ORIGINS/
+    ALLOWED_HOSTS — a deployment (e.g. Portainer on a LAN IP) sets these
+    via a real container env var, not by editing the settings module."""
+
+    def test_unset_env_var_returns_default(self):
+        with patch.dict("os.environ", {}, clear=False):
+            os.environ.pop("SOME_UNSET_VAR", None)
+            self.assertEqual(_env_list("SOME_UNSET_VAR", ["default"]), ["default"])
+
+    def test_set_env_var_is_parsed_and_stripped(self):
+        with patch.dict(
+            "os.environ", {"SOME_VAR": "http://a.example, http://b.example"}
+        ):
+            self.assertEqual(
+                _env_list("SOME_VAR", ["default"]),
+                ["http://a.example", "http://b.example"],
+            )
 
 
 class IsAdminOrReadOnlyTests(TestCase):
