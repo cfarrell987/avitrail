@@ -26,8 +26,16 @@ services:
         condition: service_healthy
     networks:
       - default
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.import-airports.schedule: "@weekly"
+      ofelia.job-exec.import-airports.command: "python manage.py import_airports --yes"
+      ofelia.job-exec.import-airlines.schedule: "@weekly"
+      ofelia.job-exec.import-airlines.command: "python manage.py import_airlines --yes"
     command: >
       sh -c "python manage.py migrate --run-syncdb &&
+             (python manage.py import_airports --yes || echo 'Airport import failed, continuing startup') &&
+             (python manage.py import_airlines --yes || echo 'Airline import failed, continuing startup') &&
              gunicorn avitrail.wsgi:application --bind 0.0.0.0:8000"
 
   frontend:
@@ -48,6 +56,18 @@ services:
       - 8080:80
     depends_on:
       - web
+    networks:
+      - default
+
+  # Runs the ofelia.job-exec.* labels on web via `docker exec` on schedule.
+  scheduler:
+    image: mcuadros/ofelia:0.3.13
+    hostname: scheduler
+    depends_on:
+      - web
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - default
 
